@@ -17,7 +17,11 @@ premarket_screener.py — 미국 프리마켓 동전주 급등 스크리너 (무
   python premarket_screener.py --max-price 1       # $1 미만 초동전주만
   python premarket_screener.py --min-change 30     # +30% 이상 급등만
   python premarket_screener.py --session regular   # 정규장 급등주 모드 (테스트/장중용)
+  python premarket_screener.py --min-strength 70   # 강도 70 이상(고점 유지 = 매수세)만
   python premarket_screener.py --notify            # 텔레그램 발송 (환경변수 필요)
+
+강도% = 당일 고가~저가 범위에서 현재가 위치 (한국식 체결강도의 미국 무료데이터 근사판).
+  100 = 고점 부근 매수세 유지 / 0 = 저점 = 매도세에 밀림. 30 미만이면 '매도추세' 플래그.
   python premarket_screener.py --ci                # GitHub Actions용: 프리마켓 아니면 조용히 종료
 
 텔레그램 발송에 필요한 환경변수: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
@@ -60,6 +64,10 @@ COLUMNS = [
     "premarket_close",             # 프리마켓 현재가
     "premarket_change",            # 프리마켓 등락률 %
     "premarket_volume",            # 프리마켓 거래량
+    "premarket_high",              # 프리마켓 고가
+    "premarket_low",               # 프리마켓 저가
+    "high",                        # 당일 고가 (정규장)
+    "low",                         # 당일 저가 (정규장)
     "change",                      # 정규장 등락률 %
     "volume",                      # 정규장 거래량
     "average_volume_10d_calc",     # 10일 평균 거래량
@@ -163,7 +171,21 @@ def risk_flags(row, mode: str) -> str:
     if not pd.isna(change) and change > 100:
         flags.append("과열(+100%↑)")    # 펌프/희석 발표 최다 구간
 
+    if not pd.isna(row["strength"]) and row["strength"] < 30:
+        flags.append("매도추세(고점이탈)")  # 고점 찍고 범위 하단으로 밀리는 중
+
     return " ".join(flags) if flags else "-"
+
+
+def add_strength(df: pd.DataFrame, mode: str) -> pd.DataFrame:
+    """강도% = (현재가-저가)/(고가-저가)*100. 체결강도 근사 — 고점 유지력."""
+    if mode == "premarket":
+        hi, lo, cur = df["premarket_high"], df["premarket_low"], df["premarket_close"]
+    else:
+        hi, lo, cur = df["high"], df["low"], df["close"]
+    rng = hi - lo
+    df["strength"] = ((cur - lo) / rng * 100).where(rng > 0)
+    return df
 
 
 def humanize(n):
@@ -199,10 +221,11 @@ def send_telegram(df: pd.DataFrame, mode: str, et: datetime) -> bool:
         chg = r["premarket_change"] if mode == "premarket" else r["change"]
         vol = r["premarket_volume"] if mode == "premarket" else r["volume"]
         flag = "" if r["flags"] == "-" else f"  ⚠{html.escape(r['flags'])}"
+        strength = f"{r['strength']:.0f}" if pd.notna(r["strength"]) else "-"
         lines.append(
             f'<a href="https://finviz.com/quote.ashx?t={ticker}">{ticker}</a>'
             f"  ${price:.2f}  +{chg:.1f}%  V:{humanize(vol)}"
-            f"  F:{humanize(r['float_shares_outstanding'])}{flag}"
+            f"  강도:{strength}  F:{humanize(r['float_shares_outstanding'])}{flag}"
         )
     lines += ["", "⚠️ 투자 추천 아님 · 진입 전 뉴스/공시(424B5) 확인"]
 
@@ -224,6 +247,9 @@ def main():
     ap.add_argument("--min-change", type=float, default=10.0, help="최소 등락률 %% (기본 10)")
     ap.add_argument("--min-volume", type=float, default=100_000, help="최소 거래량 (기본 10만주)")
     ap.add_argument("--top", type=int, default=50, help="상위 N개 (기본 50)")
+    ap.add_argument("--min-strength", type=float, default=0,
+                    help="최소 강도%% — 고가~저가 범위 내 현재가 위치. "
+                         "70이면 고점 유지(매수세) 종목만, 0=끄기 (기본 0)")
     ap.add_argument("--session", choices=["auto", "premarket", "regular"], default="auto",
                     help="auto: 시간 보고 자동 선택 (기본)")
     ap.add_argument("--notify", action="store_true", help="텔레그램 발송")
@@ -257,6 +283,15 @@ def main():
         print("결과 없음. --min-change 를 낮추거나 프리마켓 시간에 다시 실행해 보세요.")
         return
 
+    df = add_strength(df, mode)
+    if args.min_strength > 0:
+        before = len(df)
+        df = df[df["strength"] >= args.min_strength].reset_index(drop=True)
+        print(f"강도 {args.min_strength:.0f}% 필터: {before}개 → {len(df)}개")
+        if df.empty:
+            print("결과 없음. --min-strength 를 낮춰 보세요.")
+            return
+
     df["flags"] = df.apply(lambda r: risk_flags(r, mode), axis=1)
 
     if mode == "premarket":
@@ -267,6 +302,7 @@ def main():
             "PM가격": df["premarket_close"].map(lambda x: f"${x:.2f}" if pd.notna(x) else "-"),
             "PM등락%": df["premarket_change"].map(lambda x: f"+{x:.1f}" if pd.notna(x) else "-"),
             "PM거래량": df["premarket_volume"].map(humanize),
+            "강도%": df["strength"].map(lambda x: f"{x:.0f}" if pd.notna(x) else "-"),
             "Float": df["float_shares_outstanding"].map(humanize),
             "시총": df["market_cap_basic"].map(humanize),
             "리스크": df["flags"],
@@ -280,6 +316,7 @@ def main():
             "거래량": df["volume"].map(humanize),
             "상대거래량": df["relative_volume_10d_calc"].map(
                 lambda x: f"{x:.1f}x" if pd.notna(x) else "-"),
+            "강도%": df["strength"].map(lambda x: f"{x:.0f}" if pd.notna(x) else "-"),
             "Float": df["float_shares_outstanding"].map(humanize),
             "시총": df["market_cap_basic"].map(humanize),
             "리스크": df["flags"],
