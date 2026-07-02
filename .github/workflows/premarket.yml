@@ -37,7 +37,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python premarket_screener.py --ci --notify --session "${{ inputs.session || 'auto' }}"
+        run: python premarket_screener.py --ci --notify --min-strength 90 --session "${{ inputs.session || 'auto' }}"
 
       - name: Commit CSV results
         run: |
