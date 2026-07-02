@@ -19,10 +19,10 @@ premarket_screener.py — 미국 프리마켓 동전주 급등 스크리너 (무
   python premarket_screener.py --session regular   # 정규장 급등주 모드 (테스트/장중용)
   python premarket_screener.py --min-strength 70   # 강도 70 이상(고점 유지 = 매수세)만
   python premarket_screener.py --notify            # 텔레그램 발송 (환경변수 필요)
+  python premarket_screener.py --ci                # GitHub Actions용: 프리마켓 아니면 조용히 종료
 
 강도% = 당일 고가~저가 범위에서 현재가 위치 (한국식 체결강도의 미국 무료데이터 근사판).
   100 = 고점 부근 매수세 유지 / 0 = 저점 = 매도세에 밀림. 30 미만이면 '매도추세' 플래그.
-  python premarket_screener.py --ci                # GitHub Actions용: 프리마켓 아니면 조용히 종료
 
 텔레그램 발송에 필요한 환경변수: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 
