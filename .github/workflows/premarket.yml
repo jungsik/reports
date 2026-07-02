@@ -1,0 +1,51 @@
+name: Premarket penny gapper scan
+
+on:
+  schedule:
+    # 08:00~14:30 UTC 30분 간격 (월~금) — 서머타임/겨울 프리마켓을 모두 커버.
+    # 프리마켓이 아닌 시각의 실행은 스크립트(--ci)가 알아서 스킵한다.
+    - cron: "*/30 8-14 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      session:
+        description: "세션 (auto=프리마켓만 / regular=정규장 테스트)"
+        type: choice
+        options: [auto, regular]
+        default: auto
+
+permissions:
+  contents: write
+
+concurrency:
+  group: premarket-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Run screener
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python premarket_screener.py --ci --notify --session "${{ inputs.session || 'auto' }}"
+
+      - name: Commit CSV results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reports/
+          if ! git diff --cached --quiet; then
+            git commit -m "scan: $(date -u +'%Y-%m-%d %H:%M') UTC"
+            git pull --rebase origin main
+            git push
+          fi
