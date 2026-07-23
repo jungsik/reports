@@ -1,0 +1,3 @@
+﻿name,description,close,premarket_close,premarket_change,premarket_volume,premarket_high,premarket_low,high,low,change,volume,average_volume_10d_calc,relative_volume_10d_calc,float_shares_outstanding,market_cap_basic,sector,exchange,strength,flags
+DOMO,"Domo, Inc.",3.15,4.23,34.285714285714306,1635612,4.26,3.74,3.55,3.14,-8.430232558139537,2851151,1202040.7,2.777426707727413,36926318.2068,142224270.99999997,Technology Services,NASDAQ,94.23076923076935,-
+OMH,Ohmyhome Limited,0.361,0.45,24.65373961218837,2250159,0.46,0.3595,0.41,0.3117,-55.21647438283092,10628234,32000149.5,0.34331999979481365,22170284.524919998,8035712.999999998,Finance,NASDAQ,90.04975124378109,$1미만(상폐권)
