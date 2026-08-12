@@ -1,0 +1,3 @@
+﻿name,description,close,premarket_close,premarket_change,premarket_volume,premarket_high,premarket_low,high,low,change,volume,average_volume_10d_calc,relative_volume_10d_calc,float_shares_outstanding,market_cap_basic,sector,exchange,strength,flags
+CYCU,"Cycurion, Inc.",0.5881,0.7499,27.512327835402157,6246048,0.75,0.5813,0.6193,0.5819,-9.38366718027736,2115052,91828111.9,0.0230751908394648,10628825.042952,6747029.000000001,Technology Services,NASDAQ,99.94072317723771,저유통(<20M) $1미만(상폐권)
+NRGV,"Energy Vault Holdings, Inc.",3.58,4.12,15.083798882681565,102635,4.12,4.0,3.705,3.47,7.185628742514977,9041553,6321528.0,1.5492475077463206,131652372.07800001,648836584.0000001,Producer Manufacturing,NYSE,100.0,거래량허수
