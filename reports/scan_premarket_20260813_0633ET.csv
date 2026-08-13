@@ -1,0 +1,3 @@
+﻿name,description,close,premarket_close,premarket_change,premarket_volume,premarket_high,premarket_low,high,low,change,volume,average_volume_10d_calc,relative_volume_10d_calc,float_shares_outstanding,market_cap_basic,sector,exchange,strength,flags
+IVDA,"Iveda Solutions, Inc.",0.368,0.5728,55.65217391304348,34756654,0.58,0.408,0.4777,0.295,23.489932885906043,91628825,9440020.7,286.98705456613754,10626098.098,4266602.0,Electronic Technology,NASDAQ,95.8139534883721,저유통(<20M) $1미만(상폐권)
+OPEN,Opendoor Technologies Inc,3.49,3.92,12.320916905444117,1015107,3.95,3.45,3.65,3.45,-2.5139664804469235,19415774,38467667.5,0.4881923058141395,811344588.318,3389107824.0,Finance,NASDAQ,93.99999999999994,거래량허수
