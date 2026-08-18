@@ -1,0 +1,3 @@
+﻿name,description,close,premarket_close,premarket_change,premarket_volume,premarket_high,premarket_low,high,low,change,volume,average_volume_10d_calc,relative_volume_10d_calc,float_shares_outstanding,market_cap_basic,sector,exchange,strength,flags
+SGLY,Singularity Future Technology Ltd.,4.49,7.54,67.92873051224943,923087,7.71,5.03,4.92,4.4,-8.739837398373979,2178053,331012.4,5.146769145846152,896904.0,4027099.2520325202,Transportation,NASDAQ,93.65671641791045,초저유통(<5M)
+BAOS,Baosheng Media Group Holdings Limited,0.4797,0.53,10.485720241817804,210576,0.53,0.4635,0.49,0.4004,-4.059999999999997,8812320,12847752.4,0.7351658581818282,1000114.59893,736093.8936000001,Commercial Services,NASDAQ,100.0,초저유통(<5M) $1미만(상폐권) 거래량허수
