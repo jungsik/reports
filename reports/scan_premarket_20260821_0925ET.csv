@@ -1,0 +1,3 @@
+﻿name,description,close,premarket_close,premarket_change,premarket_volume,premarket_high,premarket_low,high,low,change,volume,average_volume_10d_calc,relative_volume_10d_calc,float_shares_outstanding,market_cap_basic,sector,exchange,strength,flags
+LGO,Largo Inc.,0.6418,0.748,16.547210969149262,264080,0.7498,0.6675,0.6482,0.62,-0.6655316514471399,1643243,745013.3,2.6305015254812765,,,,NASDAQ,97.81287970838393,float불명 $1미만(상폐권)
+DEFT,"Defi Technologies, Inc.",0.5149,0.5767,12.002330549621279,409990,0.58,0.5399,0.5372,0.49,6.914451827242536,2718485,2575323.8,1.0840427036624813,,,,NASDAQ,91.77057356608485,float불명 $1미만(상폐권)
